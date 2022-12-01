@@ -1,0 +1,6 @@
+name: blob
+in: path
+description: Blob identifier.
+required: true
+schema:
+  type: string

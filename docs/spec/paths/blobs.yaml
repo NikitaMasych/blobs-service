@@ -1,0 +1,59 @@
+post:
+  summary: Creates a new blob.
+  operationId: createBlob
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              required: true
+              $ref: '#/components/schemas/BlobRequest'
+   
+  responses:
+    201:
+      description: Successfully created.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                required: true
+                $ref: '#/components/schemas/Blob'
+
+    500:
+      description: Failed to create the blob.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'    
+
+get:
+    summary: Returns a list of blobs.
+    operationId: getBlobs
+    responses:
+      200:
+        description: Success.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  required: true
+                  $ref: '#/components/schemas/Blobs'
+
+      500:
+        description: Failed to get blobs.
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/Errors' 

@@ -1,0 +1,15 @@
+log:
+  disable_sentry: true
+
+db:
+  url: postgres://postgres:postgres@localhost:5432/blobs?sslmode=disable
+
+listener:
+  addr: :8080
+
+cop:
+  disabled: true
+  endpoint: "http://..."
+  upstream: "http://..."
+  service_name: blob-service
+  service_port: 80

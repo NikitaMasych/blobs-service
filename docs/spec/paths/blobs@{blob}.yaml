@@ -1,0 +1,36 @@
+parameters:
+  - $ref: '#/components/parameters/blob'
+
+get:
+  summary: Returns the blob.
+  operationId: getBlob
+  responses:
+    200:
+      description: Success.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Blob'
+    
+    500:
+      description: Failed to get the blob.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+
+delete:
+  summary: Deletes the blob.
+  operationId: deleteBlob
+  responses:
+    204:
+      description: Blob deleted.
+    500:
+      description: Failed to delete the blob.
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
