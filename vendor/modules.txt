@@ -27,6 +27,9 @@ github.com/getsentry/sentry-go
 ## explicit
 github.com/go-chi/chi
 github.com/go-chi/chi/middleware
+# github.com/go-errors/errors v1.0.1
+## explicit
+github.com/go-errors/errors
 # github.com/go-gorp/gorp/v3 v3.0.2
 ## explicit; go 1.13
 github.com/go-gorp/gorp/v3
@@ -121,7 +124,6 @@ gitlab.com/distributed_lab/kit/copus/types
 gitlab.com/distributed_lab/kit/janus
 gitlab.com/distributed_lab/kit/janus/internal
 gitlab.com/distributed_lab/kit/kv
-gitlab.com/distributed_lab/kit/pgdb
 # gitlab.com/distributed_lab/logan v3.8.1+incompatible
 ## explicit
 gitlab.com/distributed_lab/logan/v3
@@ -134,13 +136,16 @@ gitlab.com/distributed_lab/lorem
 # gitlab.com/distributed_lab/running v0.0.0-20200706131153-4af0e83eb96c
 ## explicit
 gitlab.com/distributed_lab/running
-# golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
+# golang.org/x/net v0.2.0
+## explicit; go 1.17
+golang.org/x/net/context
+# golang.org/x/sys v0.2.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.3.6
-## explicit; go 1.11
+# golang.org/x/text v0.4.0
+## explicit; go 1.17
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
 # gopkg.in/ini.v1 v1.62.0

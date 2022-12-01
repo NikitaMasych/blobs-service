@@ -1,13 +1,14 @@
 package service
 
 import (
+	"blobs/internal/api/contracts"
 	"blobs/internal/api/service/handlers"
 
 	"github.com/go-chi/chi"
 	"gitlab.com/distributed_lab/ape"
 )
 
-func (s *service) router() chi.Router {
+func (s *service) router(blobQ contracts.Blobs) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(
@@ -15,10 +16,14 @@ func (s *service) router() chi.Router {
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
 			handlers.CtxLog(s.log),
+			handlers.CtxBlobQ(blobQ),
 		),
 	)
-	r.Route("/integrations/blob-service", func(r chi.Router) {
-		// configure endpoints here
+	r.Route("/blobs", func(r chi.Router) {
+		r.Post("/", handlers.CreateBlob)
+		r.Get("/", handlers.GetBlobs)
+		r.Get("/{blob}", handlers.GetBlob)
+		r.Delete("/{blob}", handlers.DeleteBlob)
 	})
 
 	return r

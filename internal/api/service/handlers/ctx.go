@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"blobs/internal/api/contracts"
 	"context"
 	"net/http"
 
@@ -10,7 +11,8 @@ import (
 type ctxKey int
 
 const (
-	logCtxKey ctxKey = iota
+	logCtxKey   ctxKey = iota
+	blobQCtxKey ctxKey = 1
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -21,4 +23,10 @@ func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
 
 func Log(r *http.Request) *logan.Entry {
 	return r.Context().Value(logCtxKey).(*logan.Entry)
+}
+
+func CtxBlobQ(q contracts.Blobs) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, blobQCtxKey, q)
+	}
 }
