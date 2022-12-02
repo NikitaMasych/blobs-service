@@ -7,4 +7,5 @@ type Blobs interface {
 	Transaction(fn func(Blobs) error) error
 	Create(blob *types.Blob) error
 	Get(id string) (*types.Blob, error)
+	GetAll() ([]*types.Blob, error)
 }

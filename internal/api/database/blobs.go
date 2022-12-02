@@ -17,8 +17,8 @@ const (
 var (
 	ErrBlobsConflict = errors.New("blobs primary key conflict")
 	blobsSelect      = squirrel.
-				Select("id", "value", "type").
-				From(blobsTable)
+		Select("id", "value", "type").
+		From(blobsTable)
 )
 
 type Blobs struct {
@@ -74,4 +74,25 @@ func (q *Blobs) Get(id string) (*types.Blob, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+func (q *Blobs) GetAll() ([]*types.Blob, error) {
+	var blobs []*types.Blob
+	rows, err := q.Repo.Query(blobsSelect)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	for rows.Next() {
+		blob := new(types.Blob)
+		if err = rows.StructScan(blob); err != nil {
+			return nil, err
+		}
+		blobs = append(blobs, blob)
+	}
+	return blobs, nil
+
 }
