@@ -30,3 +30,7 @@ func CtxBlobQ(q contracts.Blobs) func(context.Context) context.Context {
 		return context.WithValue(ctx, blobQCtxKey, q)
 	}
 }
+
+func BlobQ(r *http.Request) contracts.Blobs {
+	return r.Context().Value(blobQCtxKey).(contracts.Blobs).New()
+}

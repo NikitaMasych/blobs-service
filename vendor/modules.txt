@@ -33,6 +33,9 @@ github.com/go-errors/errors
 # github.com/go-gorp/gorp/v3 v3.0.2
 ## explicit; go 1.13
 github.com/go-gorp/gorp/v3
+# github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+## explicit
+github.com/go-ozzo/ozzo-validation
 # github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 ## explicit; go 1.13
 github.com/go-ozzo/ozzo-validation/v4
@@ -136,6 +139,9 @@ gitlab.com/distributed_lab/lorem
 # gitlab.com/distributed_lab/running v0.0.0-20200706131153-4af0e83eb96c
 ## explicit
 gitlab.com/distributed_lab/running
+# gitlab.com/tokend/go v3.16.0+incompatible
+## explicit
+gitlab.com/tokend/go/hash
 # golang.org/x/net v0.2.0
 ## explicit; go 1.17
 golang.org/x/net/context
