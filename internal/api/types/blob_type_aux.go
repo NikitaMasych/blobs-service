@@ -7,24 +7,26 @@ import (
 	"fmt"
 )
 
-func init() {
-	// stubs for imports
-	_ = json.Delim('s')
-	_ = driver.Int32
+/*
+	func init() {
+		// stubs for imports
+		_ = json.Delim('s')
+		_ = driver.Int32
 
 }
-
+*/
 var ErrBlobTypeInvalid = errors.New("BlobType is invalid")
 
-func init() {
-	var v BlobType
-	if _, ok := interface{}(v).(fmt.Stringer); ok {
-		_BlobTypeNameToValue = map[string]BlobType{
-			interface{}(BlobTypeOrdinary).(fmt.Stringer).String(): BlobTypeOrdinary,
+/*
+	func init() {
+		var v BlobType
+		if _, ok := interface{}(v).(fmt.Stringer); ok {
+			_BlobTypeNameToValue = map[string]BlobType{
+				interface{}(BlobTypeOrdinary).(fmt.Stringer).String(): BlobTypeOrdinary,
+			}
 		}
 	}
-}
-
+*/
 var _BlobTypeNameToValue = map[string]BlobType{
 	"ordinary": BlobTypeOrdinary,
 }

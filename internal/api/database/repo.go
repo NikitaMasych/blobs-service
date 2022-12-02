@@ -136,7 +136,6 @@ func (r *Repo) ExecAll(script string) error {
 	}
 
 	defer r.Rollback()
-
 	for _, cmd := range AllStatements(script) {
 		_, err = r.ExecRaw(cmd)
 		if err != nil {
@@ -151,7 +150,8 @@ func (r *Repo) ExecAll(script string) error {
 func (r *Repo) ExecRaw(query string, args ...interface{}) (sql.Result, error) {
 	query = r.conn().Rebind(query)
 	start := time.Now()
-	result, err := r.conn().Exec(query, args...)
+	result, err := r.conn().
+		Exec(query, args...)
 	r.log("exec", start, query, args)
 
 	if err == nil {

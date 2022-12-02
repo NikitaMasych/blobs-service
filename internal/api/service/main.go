@@ -20,7 +20,7 @@ type service struct {
 }
 
 func (s *service) run() error {
-	s.log.Info("Service started")
+	s.log.Info("Service started on", s.listener.Addr())
 	r := s.router(postgres.NewBlobs(s.db))
 
 	if err := s.copus.RegisterChi(r); err != nil {
@@ -40,7 +40,8 @@ func newService(cfg config.Config) *service {
 }
 
 func Run(cfg config.Config) {
-	if err := newService(cfg).run(); err != nil {
+	if err := newService(cfg).
+		run(); err != nil {
 		panic(err)
 	}
 }

@@ -2,9 +2,8 @@ package postgres
 
 import (
 	"blobs/internal/api/contracts"
-	"database/sql"
-
 	"blobs/internal/api/types"
+	"database/sql"
 	"github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
