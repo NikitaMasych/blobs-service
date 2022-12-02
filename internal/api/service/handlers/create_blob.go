@@ -45,7 +45,7 @@ func CreateBlob(w http.ResponseWriter, r *http.Request) {
 	response := resources.BlobResponse{
 		Data: NewBlob(blob),
 	}
-	w.WriteHeader(201)
+	w.WriteHeader(http.StatusCreated)
 	ape.Render(w, &response)
 }
 

@@ -8,4 +8,5 @@ type Blobs interface {
 	Create(blob *types.Blob) error
 	Get(id string) (*types.Blob, error)
 	GetAll() ([]*types.Blob, error)
+	Delete(id string) error
 }

@@ -17,8 +17,8 @@ const (
 var (
 	ErrBlobsConflict = errors.New("blobs primary key conflict")
 	blobsSelect      = squirrel.
-		Select("id", "value", "type").
-		From(blobsTable)
+				Select("id", "value", "type").
+				From(blobsTable)
 )
 
 type Blobs struct {
@@ -48,6 +48,22 @@ func (q *Blobs) Create(blob *types.Blob) error {
 		"type":  blob.Type,
 		"value": blob.Value,
 	})
+
+	_, err := q.Exec(stmt)
+	if err != nil {
+		cause := errors.Cause(err)
+		pqerr, ok := cause.(*pq.Error)
+		if ok {
+			if pqerr.Constraint == blobsPKConstraint {
+				return ErrBlobsConflict
+			}
+		}
+	}
+	return err
+}
+
+func (q *Blobs) Delete(id string) error {
+	stmt := squirrel.Delete(blobsTable).Where("id = ?", id)
 
 	_, err := q.Exec(stmt)
 	if err != nil {
