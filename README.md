@@ -7,11 +7,10 @@ JSON-API working with blobs
 ## Install
 
   ```bash
-  git clone blobs
+  git clone https://github.com/NikitaMasych/blobs-service
   cd blob-service
   go build main.go
   export KV_VIPER_FILE=./config.yaml
-  ./main migrate up
   ./main run service
   ```
 
@@ -35,14 +34,13 @@ use `./generate.sh --help` to see all available options.
 ## Running from docker 
   
 Make sure that docker installed.
-{%_ if (handleHTTP) { _%}
-use `docker run ` with `-p 8080:80` to expose port 80 to 8080
 
-{%_ } _%}
+Use `docker run ` with `-p 8080:80` to expose port 80 to 8080
+
 
     ```bash
     docker build -t blobs .
-    docker run -e KV_VIPER_FILE=/config.yaml blobs
+    docker run -e KV_VIPER_FILE=/usr/local/bin/config.yaml blobs
     ```
 
 ## Running from Source
@@ -63,5 +61,5 @@ You can [install it locally](https://www.postgresql.org/download/) or use [docke
 
 ## Contact
 
-Responsible Nikita Masych
-The primary contact for this project is  t.me/Just_law_abiding_citizen
+Responsible Nikita Masych.
+The primary contact for this project is t.me/Just_law_abiding_citizen

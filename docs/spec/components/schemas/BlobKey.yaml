@@ -5,7 +5,7 @@ required:
 properties:
   id:
     type: string
-    example: 
+    example: KBLADJIXMUL63KAQ4HZ4TUSWKD5XU36EEMYOL6XZIFBZLNQZFPEA
   type:
     type: string
-    example: title
+    example: ordinary
