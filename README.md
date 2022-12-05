@@ -40,7 +40,7 @@ Use `docker run ` with `-p 8080:80` to expose port 80 to 8080
 
     ```bash
     docker build -t blobs .
-    docker run -e KV_VIPER_FILE=/usr/local/bin/config.yaml blobs
+    docker run -e KV_VIPER_FILE=/usr/local/bin/config.yaml --network=host -p 8080:8080 blobs run service
     ```
 
 ## Running from Source

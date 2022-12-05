@@ -18,4 +18,5 @@ COPY --from=buildbase /go/src/blobs/config.yaml /usr/local/bin/config.yaml
 COPY --from=buildbase /usr/local/bin/blob-service /usr/local/bin/blob-service
 RUN apk add --no-cache ca-certificates
 
+EXPOSE 8080
 ENTRYPOINT ["blob-service"]
