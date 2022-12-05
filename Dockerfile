@@ -1,22 +1,14 @@
 FROM golang:1.19-alpine as buildbase
 
-RUN apk add git build-base
-
 WORKDIR /go/src/blobs
-COPY go.mod .
-COPY go.sum .
-
-RUN go mod download
 
 COPY . .
-RUN GOOS=linux go build -o /usr/local/bin/blob-service main.go
 
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o /usr/local/bin/blobs-service main.go
 
-FROM alpine:3.9
+FROM alpine:3.17.0
 
-COPY --from=buildbase /go/src/blobs/config.yaml /usr/local/bin/config.yaml
-COPY --from=buildbase /usr/local/bin/blob-service /usr/local/bin/blob-service
+COPY --from=buildbase /usr/local/bin/blobs-service /usr/local/bin/blobs-service
 RUN apk add --no-cache ca-certificates
 
-EXPOSE 8080
-ENTRYPOINT ["blob-service"]
+ENTRYPOINT ["blobs-service"]

@@ -10,7 +10,3 @@ listener:
 
 cop:
   disabled: true
-  endpoint: "http://..."
-  upstream: "http://..."
-  service_name: blob-service
-  service_port: 80

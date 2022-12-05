@@ -1,0 +1,13 @@
+services:
+  blobs:
+    image: blobs-service
+    container_name: blobs-service
+    build: .
+    command:
+      - run
+      - service
+    environment:
+      - KV_VIPER_FILE=/usr/local/bin/config.yaml
+    volumes:
+      - ./config.yaml:/usr/local/bin/config.yaml
+    network_mode: host

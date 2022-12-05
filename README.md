@@ -1,4 +1,4 @@
-# blob-service
+# blobs-service
 
 ## Description
 
@@ -8,7 +8,7 @@ JSON-API working with blobs
 
   ```bash
   git clone https://github.com/NikitaMasych/blobs-service
-  cd blob-service
+  cd blobs-service
   go build main.go
   export KV_VIPER_FILE=./config.yaml
   ./main run service
@@ -19,11 +19,12 @@ JSON-API working with blobs
 We do use openapi:json standard for API. We use swagger for documenting our API.
 
 To open online documentation, go to [swagger editor](http://localhost:8080/swagger-editor/) here is how you can start it
-```bash
+
+  ```bash
   cd docs
   npm install
   npm start
-```
+  ```
 To build documentation use `npm run build` command,
 that will create open-api documentation in `web_deploy` folder.
 
@@ -35,29 +36,25 @@ use `./generate.sh --help` to see all available options.
   
 Make sure that docker installed.
 
-Use `docker run ` with `-p 8080:80` to expose port 80 to 8080
-
-
-    ```bash
-    docker build -t blobs .
-    docker run -e KV_VIPER_FILE=/usr/local/bin/config.yaml --network=host -p 8080:8080 blobs run service
-    ```
+  ```bash
+  docker build -t blobs-service .
+  docker run \
+          --env KV_VIPER_FILE=/usr/local/bin/config.yaml \
+          --volume $(pwd)/config.yaml:/usr/local/bin/config.yaml \
+          --network=host \
+         blobs-service
+  ```
 
 ## Running from Source
 
+* Create valid config file
 * Set up environment value with config file path `KV_VIPER_FILE=./config.yaml`
-* Provide valid config file
 * Launch the service with `migrate up` command to create database schema
 * Launch the service with `run service` command
-
 
 ### Database
 For services, we do use ***PostgresSQL*** database. 
 You can [install it locally](https://www.postgresql.org/download/) or use [docker image](https://hub.docker.com/_/postgres/).
-
-
-### Third-party services
-
 
 ## Contact
 

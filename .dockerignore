@@ -1,0 +1,10 @@
+.vscode/
+.idea/
+docs/
+generate.sh
+README.md
+config.*.yaml
+go.sum
+Dockerfile
+.gitignore
+.dockerignore
