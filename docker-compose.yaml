@@ -1,7 +1,7 @@
 services:
   blobs:
     image: blobs-service
-    container_name: blobs-service
+    container_name: blobs_service
     build: .
     command:
       - run

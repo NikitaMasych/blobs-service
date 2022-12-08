@@ -37,12 +37,12 @@ use `./generate.sh --help` to see all available options.
 Make sure that docker installed.
 
   ```bash
-  docker build -t blobs-service .
+  docker build -t blobs_service .
   docker run \
           --env KV_VIPER_FILE=/usr/local/bin/config.yaml \
           --volume $(pwd)/config.yaml:/usr/local/bin/config.yaml \
           --network=host \
-         blobs-service
+         blobs_service
   ```
 
 ## Running from Source

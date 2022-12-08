@@ -5,29 +5,45 @@ import (
 	"gitlab.com/distributed_lab/kit/copus"
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"
+	"gitlab.com/distributed_lab/kit/pgdb"
+	"gitlab.com/tokend/connectors/builder"
+	"gitlab.com/tokend/connectors/keyer"
+	"gitlab.com/tokend/connectors/submit"
 )
 
 type Config interface {
-	Databaser
+	pgdb.Databaser
+	Horizoner
+	submit.Submission
 	types.Copuser
 	comfig.Listenerer
+	builder.Builderer
+	keyer.Keyer
 	comfig.Logger
 }
 
 type config struct {
 	getter kv.Getter
-	Databaser
+	pgdb.Databaser
+	Horizoner
+	submit.Submission
 	types.Copuser
 	comfig.Listenerer
+	builder.Builderer
+	keyer.Keyer
 	comfig.Logger
 }
 
 func New(getter kv.Getter) Config {
 	return config{
 		getter:     getter,
-		Databaser:  NewDatabaser(getter),
+		Databaser:  pgdb.NewDatabaser(getter),
+		Horizoner:  NewHorizoner(getter),
+		Submission: submit.NewSubmission(getter),
 		Copuser:    copus.NewCopuser(getter),
 		Listenerer: comfig.NewListenerer(getter),
+		Builderer:  builder.NewBuilderer(getter),
+		Keyer:      keyer.NewKeyer(getter),
 		Logger:     comfig.NewLogger(getter, comfig.LoggerOpts{}),
 	}
 }
