@@ -11,4 +11,4 @@ FROM alpine:3.17.0
 COPY --from=buildbase /usr/local/bin/blobs-service /usr/local/bin/blobs-service
 RUN apk add --no-cache ca-certificates
 
-ENTRYPOINT ["blobs-service"]
+CMD ["blobs-service"]

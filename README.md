@@ -2,7 +2,7 @@
 
 ## Description
 
-JSON-API working with blobs
+JSON-API working with blobs and assets
 
 ## Install
 
@@ -44,11 +44,16 @@ Make sure that docker installed.
           --network=host \
          blobs_service
   ```
+### Docker-compose:
+
+  ```bash
+  docker compose up
+  ```
 
 ## Running from Source
 
 * Create valid config file
-* Set up environment value with config file path `KV_VIPER_FILE=./config.yaml`
+* Set up environment value with config file path like `KV_VIPER_FILE=./config.yaml`
 * Launch the service with `migrate up` command to create database schema
 * Launch the service with `run service` command
 

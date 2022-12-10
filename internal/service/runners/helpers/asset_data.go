@@ -5,12 +5,14 @@ import (
 )
 
 type AssetDetails struct {
-	Name          string `json:"name"`
-	ContractOwner string `json:"contract_owner"`
+	Name  string `json:"name"`
+	Owner string `json:"owner"`
 }
 
 const (
+	MaxIssuanceAmount = 1000000
 	OrdinaryAssetType = uint64(0)
+	Decimals          = 6
 	Policy            = uint32(xdr.AssetPolicyBaseAsset)
 )
 

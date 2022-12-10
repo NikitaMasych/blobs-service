@@ -4,7 +4,6 @@ import (
 	"blobs/internal/api/ctx"
 	"blobs/internal/api/handlers"
 	"blobs/internal/config"
-	"blobs/internal/database"
 	"github.com/go-chi/chi"
 	"gitlab.com/distributed_lab/ape"
 	"net/http"
@@ -34,7 +33,7 @@ func attachMiddleware(m *chi.Mux, cfg config.Config) *chi.Mux {
 		ape.LoganMiddleware(cfg.Log()),
 		ape.CtxMiddleware(
 			ctx.SetLog(cfg.Log()),
-			ctx.SetBlobQ(database.NewBlobsQ(cfg.DB())),
+			ctx.SetDB(cfg.DB()),
 		),
 	)
 	return m
@@ -42,10 +41,10 @@ func attachMiddleware(m *chi.Mux, cfg config.Config) *chi.Mux {
 
 func initRoutes(m *chi.Mux) *chi.Mux {
 	m.Route("/blobs", func(r chi.Router) {
-		m.Post("/", handlers.CreateBlob)
-		m.Get("/", handlers.GetBlobs)
-		m.Get("/{blob}", handlers.GetBlob)
-		m.Delete("/{blob}", handlers.DeleteBlob)
+		r.Post("/", handlers.CreateBlobAndAsset)
+		r.Get("/", handlers.GetBlobs)
+		r.Get("/{blob}", handlers.GetBlob)
+		r.Delete("/{blob}", handlers.DeleteBlobAndAsset)
 	})
 	return m
 }

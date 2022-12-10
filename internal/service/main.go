@@ -21,6 +21,7 @@ func (s *Service) Run() error {
 	defer cancel()
 
 	go runners.NewAssetCreator(s.cfg).Run(cancellable)
+	go runners.NewAssetRemover(s.cfg).Run(cancellable)
 
 	return api.Serve(s.cfg)
 }

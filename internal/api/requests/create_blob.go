@@ -2,14 +2,13 @@ package requests
 
 import (
 	"blobs/internal/data"
+	"blobs/internal/types"
 	"encoding/base32"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"blobs/internal/resources"
-	"blobs/internal/types"
-
 	validation "github.com/go-ozzo/ozzo-validation"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/go/hash"

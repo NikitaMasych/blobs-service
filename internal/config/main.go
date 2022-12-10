@@ -13,7 +13,6 @@ import (
 
 type Config interface {
 	pgdb.Databaser
-	Horizoner
 	submit.Submission
 	types.Copuser
 	comfig.Listenerer
@@ -25,7 +24,6 @@ type Config interface {
 type config struct {
 	getter kv.Getter
 	pgdb.Databaser
-	Horizoner
 	submit.Submission
 	types.Copuser
 	comfig.Listenerer
@@ -38,7 +36,6 @@ func New(getter kv.Getter) Config {
 	return config{
 		getter:     getter,
 		Databaser:  pgdb.NewDatabaser(getter),
-		Horizoner:  NewHorizoner(getter),
 		Submission: submit.NewSubmission(getter),
 		Copuser:    copus.NewCopuser(getter),
 		Listenerer: comfig.NewListenerer(getter),

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"blobs/internal/api/ctx"
+	"blobs/internal/api/handlers/auxiliary"
 	"blobs/internal/api/requests"
+	"blobs/internal/database"
 	"blobs/internal/resources"
 	"net/http"
 
@@ -16,9 +18,9 @@ func GetBlob(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
-	blob, err := ctx.BlobQ(r).Get(request.BlobID)
+	blob, err := database.NewBlobsQ(ctx.DB(r)).Get(request.BlobID)
 	if err != nil {
-		ctx.Log(r).WithError(err).Error("failed to get blob")
+		ctx.Log(r).WithError(err).Error("failed to get the blob")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -27,7 +29,7 @@ func GetBlob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response := resources.BlobResponse{
-		Data: NewBlob(blob),
+		Data: auxiliary.NewBlob(blob),
 	}
 	ape.Render(w, &response)
 }

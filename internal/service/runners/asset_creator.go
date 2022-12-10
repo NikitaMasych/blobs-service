@@ -5,12 +5,13 @@ import (
 	"blobs/internal/database"
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
 	"gitlab.com/tokend/connectors/submit"
 	"gitlab.com/tokend/go/xdrbuild"
-	"time"
 
 	"blobs/internal/data"
 	"blobs/internal/service/runners/helpers"
@@ -21,43 +22,43 @@ type AssetCreator struct {
 	log *logan.Entry
 	cfg config.Config
 
-	pendingAssets chan data.PendingAsset
-	pendingQ      data.PendingAssets
+	assets  chan data.Asset
+	assetsQ data.Assets
 }
 
 func NewAssetCreator(cfg config.Config) *AssetCreator {
 	return &AssetCreator{
-		log:           cfg.Log(),
-		cfg:           cfg,
-		pendingAssets: make(chan data.PendingAsset),
-		pendingQ:      database.NewPendingAssetsQ(cfg.DB()),
+		log:     cfg.Log(),
+		cfg:     cfg,
+		assets:  make(chan data.Asset),
+		assetsQ: database.NewAssetsQ(cfg.DB()),
 	}
 }
 
 func (c *AssetCreator) Run(ctx context.Context) {
 	c.log.Info("asset creator started")
-	go running.WithBackOff(ctx, c.log, "tx_checker",
+	go running.WithBackOff(ctx, c.log, "selector",
 		c.selector, 20*time.Second, 30*time.Second, time.Minute)
-	go running.WithBackOff(ctx, c.log, "asset_creator",
+	go running.WithBackOff(ctx, c.log, "receiver",
 		c.receiver, 20*time.Second, 30*time.Second, time.Minute)
 }
 
 func (c *AssetCreator) selector(_ context.Context) error {
-	c.log.Info("selecting pending assets")
-	pendingAssets, err := c.pendingQ.
+	c.log.Info("selecting assets to create")
+	pendingAssets, err := c.assetsQ.
 		New().
-		FilterByStatus(types.Pending).
+		FilterByStatus(types.PendingCreation).
 		Select()
 	if err != nil {
-		return errors.Wrap(err, "failed to select pending assets")
+		return errors.Wrap(err, "failed to select assets to create")
 	}
 
 	for _, pending := range pendingAssets {
 		c.log.
-			WithFields(logan.F{"tx_id": pending.TxId, "asset_code": pending.AssetCode}).
+			WithFields(logan.F{"asset_code": pending.AssetCode}).
 			Info("prepared for creating")
 
-		c.pendingAssets <- pending
+		c.assets <- pending
 	}
 
 	return nil
@@ -65,17 +66,13 @@ func (c *AssetCreator) selector(_ context.Context) error {
 
 func (c *AssetCreator) receiver(ctx context.Context) error {
 	ticker := time.NewTicker(1 * time.Second)
-
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case pending := <-c.pendingAssets:
-
+		case pending := <-c.assets:
 			c.log.Info("processing ", pending)
-
-			err := c.create(ctx, pending)
-			if err != nil {
+			if err := c.create(ctx, pending); err != nil {
 				return errors.Wrap(err, "failed to create asset")
 			}
 		default:
@@ -84,30 +81,17 @@ func (c *AssetCreator) receiver(ctx context.Context) error {
 	}
 }
 
-func (c *AssetCreator) create(ctx context.Context, pending data.PendingAsset) error {
-	tx := c.cfg.Builder().Transaction(c.cfg.Keys().Source)
-
-	op, err := c.populateCreateAssetOp(pending)
+func (c *AssetCreator) create(ctx context.Context, pending data.Asset) error {
+	envelope, err := c.composeEnvelope(pending)
 	if err != nil {
-		return errors.Wrap(err, "failed to populate create asset operation")
+		return errors.Wrap(err, "failed to compose envelope")
 	}
 
-	tx = tx.Op(op)
-
-	tx.Sign(c.cfg.Keys().Signer)
-
-	envelope, err := tx.Marshal()
-	if err != nil {
-		return errors.Wrap(err, "failed to marshal tx")
-	}
-
-	db := c.cfg.DB().Clone()
-	q := database.NewPendingAssetsQ(db)
-
+	db := c.cfg.DB()
 	err = db.Transaction(func() error {
-		err = q.UpdateStatus(types.Approved, pending.TxId)
+		err = database.NewAssetsQ(db).UpdateStatus(types.Created, pending.AssetCode)
 		if err != nil {
-			return errors.Wrap(err, "failed to update pending status")
+			return errors.Wrap(err, "failed to update pending creation status")
 		}
 
 		_, err = c.cfg.Submit().Submit(ctx, envelope, true, true)
@@ -133,27 +117,47 @@ func (c *AssetCreator) create(ctx context.Context, pending data.PendingAsset) er
 	return nil
 }
 
-func (c *AssetCreator) populateCreateAssetOp(pending data.PendingAsset) (*xdrbuild.CreateAsset, error) {
+func (c *AssetCreator) composeEnvelope(pending data.Asset) (string, error) {
+	tx := c.cfg.Builder().Transaction(c.cfg.Keys().Source)
+	op, err := c.populateCreateAssetOp(pending)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to populate create asset operation")
+	}
+	tx = tx.Op(op)
+	tx.Sign(c.cfg.Keys().Signer)
+
+	envelope, err := tx.Marshal()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to marshal tx")
+	}
+
+	return envelope, nil
+}
+
+func (c *AssetCreator) populateCreateAssetOp(pending data.Asset) (*xdrbuild.CreateAsset, error) {
 	details, err := c.populateDetails(pending)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to populate details")
 	}
 
 	operation := &xdrbuild.CreateAsset{
-		Code:           pending.AssetCode,
-		Policies:       helpers.Policy,
-		Type:           helpers.OrdinaryAssetType,
-		CreatorDetails: details,
-		AllTasks:       &helpers.ZeroTasks,
+		Code:                     string(pending.AssetCode),
+		MaxIssuanceAmount:        helpers.MaxIssuanceAmount,
+		PreIssuanceSigner:        c.cfg.Keys().Signer.Address(),
+		InitialPreIssuanceAmount: helpers.MaxIssuanceAmount,
+		TrailingDigitsCount:      helpers.Decimals,
+		Policies:                 helpers.Policy,
+		Type:                     helpers.OrdinaryAssetType,
+		CreatorDetails:           details,
+		AllTasks:                 &helpers.ZeroTasks,
 	}
-
 	return operation, nil
 }
 
-func (c *AssetCreator) populateDetails(pending data.PendingAsset) (json.RawMessage, error) {
+func (c *AssetCreator) populateDetails(pending data.Asset) (json.RawMessage, error) {
 	assetDetails := helpers.AssetDetails{
-		Name:          pending.AssetCode,
-		ContractOwner: pending.Creator,
+		Name:  string(pending.AssetCode),
+		Owner: string(pending.Creator),
 	}
 	bb, err := json.Marshal(assetDetails)
 	if err != nil {

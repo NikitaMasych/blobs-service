@@ -7,11 +7,9 @@ import (
 	. "github.com/go-ozzo/ozzo-validation"
 )
 
-type (
-	GetBlobRequest struct {
-		BlobID string `json:"id"`
-	}
-)
+type GetBlobRequest struct {
+	BlobID string `json:"id"`
+}
 
 func NewGetBlobRequest(r *http.Request) (GetBlobRequest, error) {
 	request := GetBlobRequest{
