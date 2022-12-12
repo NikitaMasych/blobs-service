@@ -1,13 +1,71 @@
 services:
   blobs:
     image: blobs-service
-    container_name: blobs_service
     build: .
+    depends_on:
+      blobs-postgres:
+        condition: service_healthy
+      horizon:
+        condition: service_started
     command:
       - run
       - service
     environment:
-      - KV_VIPER_FILE=/usr/local/bin/config.yaml
+      - KV_VIPER_FILE=/etc/blobs-service/config.yaml
     volumes:
-      - ./config.yaml:/usr/local/bin/config.yaml
+      - ./configs/blobs-service.yaml:/etc/blobs-service/config.yaml
     network_mode: host
+  blobs-postgres:
+    image: postgres:alpine3.17
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=blobs
+      - PGDATA=/data/pgdata
+    volumes:
+      - blobs-postgres-data:/data
+      - ./internal/assets/migrations/up.sql:/docker-entrypoint-initdb.d/up.sql
+    ports:
+      - "5432:5432"
+  horizon:
+    image: tokend/horizon:3.10.4
+    depends_on:
+      - core
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=horizon
+      - POSTGRES_PASSWORD=horizon
+      - POSTGRES_DB=horizon
+      - PGDATA=/data/pgdata
+    volumes:
+      - ./configs/horizon.yaml:/config.yaml
+      - horizon-data:/data
+    ports:
+      - "80:80"
+  core:
+    image: tokend/core:3.7.1
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=core
+      - POSTGRES_PASSWORD=core
+      - POSTGRES_DB=core
+      - PGDATA=/data/pgdata
+      - ENSUREDB=1
+      - CONFIG=/core-config.ini
+    volumes:
+      - ./configs/core.ini:/core-config.ini
+      - core-data:/data
+    ports:
+      - "8080:8080"
+    labels:
+      - "autoheal=true"
+
+volumes:
+  horizon-data:
+  core-data:
+  blobs-postgres-data:

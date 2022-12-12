@@ -15,8 +15,3 @@ CREATE TABLE IF NOT EXISTS assets(
     creator TEXT,
     status INTEGER
 );
-
--- +migrate Down
-
-DROP TABLE blobs CASCADE;
-DROP TABLE assets CASCADE;
